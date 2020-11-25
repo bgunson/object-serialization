@@ -19,7 +19,7 @@ public class ObjectCreator {
 
         System.out.println("Choose an object you wish to create...");
         for (int i = 0; i < objects.length; i++)
-            System.out.println("[" + (i+1) + "] " + objects[i].getClass().getSimpleName() + objInfo[i]);
+            System.out.println("[" + (i+1) + "] " + objects[i] + objInfo[i]);
 
         Scanner keyboard = new Scanner(System.in);
         System.out.println("\nEnter you selection: ");
