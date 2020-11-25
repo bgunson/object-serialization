@@ -23,7 +23,7 @@ public class Serializer {
         for (Field field : fs) {
             JSONObject jsonField = new JSONObject();
             jsonField.put("name", field.getName());
-            jsonField.put("declaringclass", field.getDeclaringClass());
+            jsonField.put("declaringclass", field.getDeclaringClass().getSimpleName());
             try {
                 jsonField.put("value", field.get(source));
             } catch (IllegalAccessException e) {
@@ -36,7 +36,7 @@ public class Serializer {
         object.put("fields", fields);
         jsonContainer.put("objects", jArr);
 
-        System.out.println("\nSerialized Object: ");
+        System.out.println("Serialized Object: ");
         System.out.println(jsonContainer.toString(4));
 
         return jsonContainer.toString();
