@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Sender {
 
@@ -49,10 +50,14 @@ public class Sender {
 
             System.out.println("Server is listening on port " + port);
 
-            while (true) {
-                Socket socket = serverSocket.accept();
+            Scanner keyboard = new Scanner(System.in);
+            boolean finished = false;
 
-                System.out.println("New client connected");
+            Socket socket = serverSocket.accept();
+
+            System.out.println("New client connected");
+
+            while (!finished) {
 
                 ObjectCreator createObjs = new ObjectCreator();
                 Object obj = createObjs.createObject();
@@ -65,6 +70,13 @@ public class Sender {
                 PrintWriter writer = new PrintWriter(output, true);
 
                 writer.println(jsonString);
+
+                System.out.println("\nDo you wish to serialize another object? (y/n)");
+                String input = keyboard.nextLine();
+                if (input.equals("n")) {
+                    finished = true;
+                }
+
             }
 
         } catch (IOException ex) {

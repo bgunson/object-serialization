@@ -19,10 +19,12 @@ public class Receiver {
             InputStream input = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
-            String time = reader.readLine();
+            while (true) {
+                String time = reader.readLine();
 
-            System.out.println("Received a serialized object: ");
-            System.out.println(time);
+                System.out.println("Received a serialized object: ");
+                System.out.println(time);
+            }
 
 
         } catch (UnknownHostException ex) {

@@ -42,4 +42,8 @@ public class Serializer {
         return jsonContainer.toString();
     }
 
+    private JSONObject serializeArray(Object obj) {
+        return null;
+    }
+
 }

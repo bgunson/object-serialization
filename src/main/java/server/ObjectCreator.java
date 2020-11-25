@@ -57,20 +57,14 @@ public class ObjectCreator {
 
 
         for (Field field : fields) {
-
+            // Handle required field types
             if (field.getType().isPrimitive()) {
                 createPrimitiveField(obj, field);
             }
-
             if (field.getType().isArray()) {
                 createArrayField(obj, field);
             }
-
-
         }
-
-
-
     }
 
     private void createPrimitiveField(Object obj, Field field) {
