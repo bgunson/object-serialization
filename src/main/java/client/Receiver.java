@@ -21,6 +21,7 @@ public class Receiver {
 
             String time = reader.readLine();
 
+            System.out.println("Received a serialized object: ");
             System.out.println(time);
 
 

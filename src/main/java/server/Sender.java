@@ -13,9 +13,8 @@ import java.net.Socket;
 
 public class Sender {
 
-    JSONObject json = new JSONObject();
-
-    public String encode(Object[] objects) {
+    public static String encode(Object object) {
+        JSONObject json = new JSONObject();
         JSONArray jsonObjArr = new JSONArray();
 
         // For each Object obj in objects add serialized string to jsonObjArr
@@ -42,10 +41,6 @@ public class Sender {
 
     public static void main(String[] args) {
 
-        Sender sender = new Sender();
-        String object = sender.encode(null);
-        System.out.println(object);
-
         int port = 6868;
 
         try  {
@@ -59,10 +54,17 @@ public class Sender {
 
                 System.out.println("New client connected");
 
+                ObjectCreator createObjs = new ObjectCreator();
+                Object obj = createObjs.createObject();
+
+                // Serialize the object to a JSON String
+                System.out.println("Serializing the object...\n");
+                String jsonString = Serializer.serializeObject(obj);
+
                 OutputStream output = socket.getOutputStream();
                 PrintWriter writer = new PrintWriter(output, true);
 
-                writer.println(object);
+                writer.println(jsonString);
             }
 
         } catch (IOException ex) {
