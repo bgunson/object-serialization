@@ -53,7 +53,7 @@ public class ObjectCreator {
 
     private void createFields(Object obj) {
         Field[] fields = obj.getClass().getDeclaredFields();
-        System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " fields, please enter the desired values when instructed");
+        System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " field(s), please enter the desired values when instructed");
 
 
         for (Field field : fields) {
@@ -63,7 +63,7 @@ public class ObjectCreator {
             }
 
             if (field.getType().isArray()) {
-                // Goto create array fields method
+                createArrayField(obj, field);
             }
 
 
@@ -109,8 +109,31 @@ public class ObjectCreator {
         }
     }
 
-    private void createArrayField(Object obj) {
+    private void createArrayField(Object obj, Field field) {
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Encountered an array field of type " + field.getType().getComponentType() + ", enter the desired length");
+        System.out.println("length = ");
+        int length = keyboard.nextInt();
+        System.out.println(length);
 
+        System.out.println("When instructed, enter the values for the array entries\n");
+
+        Class arrayType = field.getType().getComponentType();
+
+        Object fieldArr = Array.newInstance(arrayType, length);
+
+
+        for (int i = 0; i < length; i++) {
+            System.out.println("[" + i +"] (" + arrayType + ") = ");
+            int entry = keyboard.nextInt();
+            Array.set(fieldArr, i, entry);
+        }
+
+        try {
+            field.set(obj, fieldArr);
+        } catch (IllegalAccessException iae) {
+            System.out.println("Could not access the array field...");
+        }
     }
 
 
