@@ -1,3 +1,5 @@
+package server;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -8,7 +10,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
 
 public class Sender {
 
@@ -22,7 +23,7 @@ public class Sender {
         // Then add arr to json object; return json.toString()
 
         try {
-            Class<?> clazz = Class.forName("Serializer");
+            Class<?> clazz = Class.forName("server.Serializer");
 
             Method method = clazz.getMethod("serializeObject", Object.class);
 
