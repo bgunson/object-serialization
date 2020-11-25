@@ -3,13 +3,11 @@ package server;
 import java.lang.reflect.*;
 import java.util.Scanner;
 
-import objects.*;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 public class ObjectCreator {
 
-    private String[] objects = {"ObjectA", "ObjectB", "ObjectC", "ObjectD", "ObjectE"};
-    private String[] objInfo = {
+    private final String[] objects = {"ObjectA", "ObjectB", "ObjectC", "ObjectD", "ObjectE"};
+    private final String[] objInfo = {
         " - A simple object with primitive instance variables",
         " - An object containing references to other objects",
         " - An object containing an array of primitives",
@@ -32,34 +30,14 @@ public class ObjectCreator {
 
         System.out.println("Creating a new " + objName + "...\n");
 
+
         try {
             Class classDef = Class.forName("objects." + objName);
 
-            Field[] fields = classDef.getDeclaredFields();
-            System.out.println(objName + " has " + fields.length + " fields, please enter the desired values when instructed");
+            Object obj = classDef.newInstance();
 
-            Object[] args = new Object[fields.length];
-            Class[] cArgs = new Class[fields.length];
+            createFields(obj);
 
-            for (int i = 0; i < fields.length; i++) {
-                Class type = fields[i].getType();
-                cArgs[i] = type;
-                System.out.println("Enter value for: " + fields[i].getName() + " (" + fields[i].getType() + ")");
-                args[i] = keyboard.nextLine();
-
-            }
-
-            // Parse user input and type cast to required types
-            for (int i = 0; i < cArgs.length; i++) {
-                if (cArgs[i].equals(int.class))
-                    args[i] = Integer.parseInt(args[i].toString());
-                if (cArgs[i].equals(boolean.class))
-                    args[i] = Boolean.parseBoolean(args[i].toString());
-                if (cArgs[i].equals(float.class))
-                    args[i] = Float.parseFloat(args[i].toString());
-            }
-
-            Object obj = classDef.getDeclaredConstructor(cArgs).newInstance(args);
             return obj;
 
         } catch (ClassNotFoundException e) {
@@ -68,12 +46,70 @@ public class ObjectCreator {
             System.out.println("Unable to create new instance of selected object...");
         } catch (IllegalAccessException iae) {
             System.out.println("Unable to access desired class...");
-        } catch (NoSuchMethodException e) {
-            System.out.println("Unable to create an object with those arguments...");
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
         }
         return null;
+
+    }
+
+    private void createFields(Object obj) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " fields, please enter the desired values when instructed");
+
+
+        for (Field field : fields) {
+
+            if (field.getType().isPrimitive()) {
+                createPrimitiveField(obj, field);
+            }
+
+            if (field.getType().isArray()) {
+                // Goto create array fields method
+            }
+
+
+        }
+
+
+
+    }
+
+    private void createPrimitiveField(Object obj, Field field) {
+
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Enter value for: ");
+        System.out.println(field.getType() + " " + field.getName() + " = ");
+        String input = keyboard.nextLine();
+
+        try {
+            // Tyr parsing user input to the fields type
+            if (field.getType().equals(int.class)) {
+                int arg = Integer.parseInt(input);
+                field.set(obj, arg);
+            } else if (field.getType().equals(boolean.class)) {
+                boolean arg = Boolean.parseBoolean(input);
+                field.set(obj, arg);
+            } else if (field.getType().equals(short.class)) {
+                short arg = Short.parseShort(input);
+                field.set(obj, arg);
+            } else if (field.getType().equals(long.class)) {
+                long arg = Long.parseLong(input);
+                field.set(obj, arg);
+            } else if (field.getType().equals(float.class)) {
+                float arg = Float.parseFloat(input);
+                field.set(obj, arg);
+            } else if (field.getType().equals(double.class)) {
+                double arg = Double.parseDouble(input);
+                field.set(obj, arg);
+            } else if (field.getType().equals(byte.class)) {
+                byte arg = Byte.parseByte(input);
+                field.set(obj, arg);
+            }
+        } catch (IllegalAccessException iae) {
+            System.out.println("Could not access tat field...");
+        }
+    }
+
+    private void createArrayField(Object obj) {
 
     }
 

@@ -10,7 +10,7 @@ public class Serializer {
 
     public static String serializeObject(Object source) {
 
-        JSONObject json = new JSONObject();
+        JSONObject jsonContainer = new JSONObject();
         JSONArray jArr = new JSONArray();
         JSONObject object = new JSONObject();
         JSONArray fields = new JSONArray();
@@ -34,12 +34,12 @@ public class Serializer {
 
         jArr.put(object);
         object.put("fields", fields);
-        json.put("objects", jArr);
+        jsonContainer.put("objects", jArr);
 
         System.out.println("\nSerialized Object: ");
-        System.out.println(json.toString(4));
+        System.out.println(jsonContainer.toString(4));
 
-        return json.toString();
+        return jsonContainer.toString();
     }
 
 }
