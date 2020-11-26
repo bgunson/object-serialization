@@ -88,7 +88,7 @@ public class ObjectCreator {
             }
             // Array
             else if (field.getType().isArray()) {
-                createArrayField(obj, field);
+                createArrayField(obj, field, object_list);
             } else {
                 createObjectField(obj, field, object_list);
 
@@ -133,7 +133,7 @@ public class ObjectCreator {
         }
     }
 
-    private void createArrayField(Object obj, Field field) {
+    private void createArrayField(Object obj, Field field, ArrayList object_list) throws Exception{
         Scanner keyboard = new Scanner(System.in);
         System.out.println("Encountered an array field of type " + field.getType().getComponentType() + ", enter the desired length");
         System.out.println("length = ");
@@ -145,18 +145,27 @@ public class ObjectCreator {
 
         Object fieldArr = Array.newInstance(arrayType, length);
 
-
         for (int i = 0; i < length; i++) {
-            System.out.println("[" + i +"] (" + arrayType + ") = ");
-            int entry = keyboard.nextInt();
-            Array.set(fieldArr, i, entry);
-        }
+            System.out.println("[" + i +"] (" + arrayType.getSimpleName() + ") = ");
+            if (!arrayType.isPrimitive()) {
+                // Array is not primitive
+                System.out.println("Input [y] for a reference to another " + arrayType.getSimpleName() + " , or...");
+                System.out.println("Input [n] if you do not want to create a new " + arrayType.getSimpleName());
+                String input = keyboard.next();
+                if (input.equals("y")) {
+                    // Create new reference
+                    Array.set(fieldArr, i, createObjectHelper(arrayType, object_list));
+                } else if (input.equals("n")) {
+                    // Create null reference
+                    Array.set(fieldArr, i, null);
+                }
 
-        try {
-            field.set(obj, fieldArr);
-        } catch (IllegalAccessException iae) {
-            System.out.println("Could not access the array field...");
+            } else {    // Array is primitive
+                int input = keyboard.nextInt();
+                Array.set(fieldArr, i, input);
+            }
         }
+        field.set(obj, fieldArr);
     }
 
     private boolean objectListContainsType(ArrayList list, Class c) {

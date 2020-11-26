@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class Serializer {
                 // Add to object list
                 object_tracking_map.put(field.get(source), object_tracking_map.size());
                 json_fields.put(serializeField(source, field, object_tracking_map));
-                object_list.put(serializeArray(source, field, object_tracking_map));
+                object_list.put(serializeArray(source, field, object_list, object_tracking_map));
             } else if (!field.getType().isPrimitive()) {    // Check if field is some other object
                 // Check if the specified field has been serialized
                 if (!object_tracking_map.containsKey(field.get(source))) {
@@ -72,7 +73,11 @@ public class Serializer {
             if (field.getType().isPrimitive()) {
                 jsonField.put("value", field.get(source));
             } else {
-                jsonField.put("reference", object_tracking_map.get(field.get(source)));
+                Object ref = object_tracking_map.get(field.get(source));
+                if (ref == null)
+                    jsonField.put("reference", "null");
+                else
+                    jsonField.put("reference", ref);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -81,7 +86,8 @@ public class Serializer {
 
     }
 
-    private static JSONObject serializeArray(Object source, Field field, Map object_tracking_map) {
+    private static JSONObject serializeArray(Object source, Field field, JSONArray object_list, Map object_tracking_map)
+        throws  Exception{
         JSONObject jsonArray = new JSONObject();
 
         jsonArray.put("class", field.getType().getSimpleName());
@@ -96,7 +102,16 @@ public class Serializer {
 
             for (int i = 0; i < length; i++) {
                 JSONObject entry = new JSONObject();
-                entry.put("value", Array.get(field.get(source), i));
+                Object e = Array.get(field.get(source), i);
+                if (e == null) {
+                    entry.put("reference", "null");
+                } else if (!e.getClass().isPrimitive()) {
+                    // Serialize e first
+                    serializeHelper(e, object_list, object_tracking_map);
+                    entry.put("reference", object_tracking_map.get(e));
+                } else {
+                    entry.put("value", e);
+                }
                 entries.put(entry);
             }
             jsonArray.put("entries", entries);
