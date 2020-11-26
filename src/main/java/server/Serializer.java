@@ -6,86 +6,74 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class Serializer {
 
-    public static String serializeObject(Object source) {
+    public static String serializeObject(Object source) throws Exception{
 
-        JSONObject jsonContainer = new JSONObject();
-        JSONArray objArray = new JSONArray();
+        JSONArray object_list = new JSONArray();
+        JSONObject json_container = new JSONObject();
+
+        serializeHelper(source, object_list, new IdentityHashMap());
+
+        json_container.put("objects", object_list);
+
+        System.out.println("Serialized Object:");
+        System.out.println(json_container.toString(4));
+        return json_container.toString();
+    }
+
+    private static void serializeHelper(Object source, JSONArray object_list, Map object_tracking_map) throws Exception {
+
+        String object_id = Integer.toString(object_tracking_map.size());
+        object_tracking_map.put(source, object_id);
         JSONObject object = new JSONObject();
 
-        object.put("id", source.hashCode());
-        object.put("type", "object");
         object.put("class", source.getClass().getName());
+        object.put("id", object_id);
+        object.put("type", "object");
 
-        // Serialize source's fields
-        Field[] fs = source.getClass().getDeclaredFields();
-        JSONArray fields = new JSONArray();
-        for (Field field : fs) {
-            // Handle an array field
+        Field[] fields = source.getClass().getDeclaredFields();
+        JSONArray json_fields = new JSONArray();
+
+        for(Field field : fields) {
+            // Check if field is an array
             if (field.getType().isArray()) {
-                fields.put(serializeField(source, field));
-                objArray.put(serializeArray(source, field));
-
-            } else if (field.getType().equals(source.getClass())) {
-
-                try {
-                    fields.put(serializeField(source, field));
-                    objArray.put(objectToJson(field.get(source)));
-                } catch (IllegalAccessException iae) {
-                    System.out.println("Could not serialize ");
+                // Add to object list
+                object_tracking_map.put(field.get(source), object_tracking_map.size());
+                json_fields.put(serializeField(source, field, object_tracking_map));
+                object_list.put(serializeArray(source, field, object_tracking_map));
+            } else if (!field.getType().isPrimitive()) {    // Check if field is some other object
+                // Check if the specified field has been serialized
+                if (!object_tracking_map.containsKey(field.get(source))) {
+                    serializeHelper(field.get(source), object_list, object_tracking_map);
                 }
-
-            } else {
-                fields.put(serializeField(source, field));
+                json_fields.put(serializeField(source, field, object_tracking_map));
+            } else {    // Field must be primitive at this point
+                json_fields.put(serializeField(source, field, object_tracking_map));
             }
         }
 
-        object.put("fields", fields);
-        objArray.put(object);
-        jsonContainer.put("objects", objArray);
+        object.put("fields", json_fields);
+        object_list.put(object);
 
-        System.out.println("Serialized Object: ");
-        System.out.println(jsonContainer.toString(4));
-
-        return jsonContainer.toString();
     }
 
-    private static JSONObject objectToJson(Object source) {
 
-        JSONObject objectJson = new JSONObject();
-
-        objectJson.put("id", source.hashCode());
-        objectJson.put("type", "object");
-        objectJson.put("class", source.getClass().getName());
-
-        // Serialize source's fields
-        Field[] fs = source.getClass().getDeclaredFields();
-        JSONArray fields = new JSONArray();
-        for (Field field : fs) {
-            JSONObject aField = serializeField(source, field);
-            //System.out.println(aField.toString(4));
-            fields.put(aField);
-
-        }
-
-        objectJson.put("fields", fields);
-
-        return objectJson;
-    }
-
-    private static JSONObject serializeField(Object source, Field field) {
+    private static JSONObject serializeField(Object source, Field field, Map object_tracking_map) {
 
         JSONObject jsonField = new JSONObject();
         jsonField.put("name", field.getName());
         jsonField.put("declaringclass", field.getDeclaringClass().getSimpleName());
 
         try {
-            if (field.getType().isPrimitive())
+            if (field.getType().isPrimitive()) {
                 jsonField.put("value", field.get(source));
-            else
-                jsonField.put("reference", field.get(source).hashCode());
+            } else {
+                jsonField.put("reference", object_tracking_map.get(field.get(source)));
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -93,12 +81,12 @@ public class Serializer {
 
     }
 
-    private static JSONObject serializeArray(Object source, Field field) {
+    private static JSONObject serializeArray(Object source, Field field, Map object_tracking_map) {
         JSONObject jsonArray = new JSONObject();
 
         jsonArray.put("class", field.getType().getSimpleName());
         try {
-            jsonArray.put("id", field.get(source).hashCode());
+            jsonArray.put("id", object_tracking_map.get(field.get(source)));
             jsonArray.put("type", "array");
 
             int length = Array.getLength(field.get(source));
@@ -117,9 +105,7 @@ public class Serializer {
             System.out.println("Serialization error: could not get length of array field...");
         }
 
-
         return jsonArray;
-
 
     }
 

@@ -14,33 +14,7 @@ import java.util.Scanner;
 
 public class Sender {
 
-    public static String encode(Object object) {
-        JSONObject json = new JSONObject();
-        JSONArray jsonObjArr = new JSONArray();
-
-        // For each Object obj in objects add serialized string to jsonObjArr
-
-        // Then add arr to json object; return json.toString()
-
-        try {
-            Class<?> clazz = Class.forName("server.Serializer");
-
-            Method method = clazz.getMethod("serializeObject", Object.class);
-
-            Object test = method.invoke(null, "test");
-
-            return test.toString();
-            //System.out.println(test.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return "";
-    }
-
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
 
         int port = 6868;
 
