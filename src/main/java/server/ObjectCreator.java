@@ -1,5 +1,7 @@
 package server;
 
+import objects.ObjectC;
+
 import java.lang.reflect.*;
 import java.util.Scanner;
 
@@ -51,6 +53,28 @@ public class ObjectCreator {
 
     }
 
+    private Object createObject(Object obj, boolean circular) {
+        try {
+            Class classDef = Class.forName(obj.getClass().getName());
+
+            Object obj2 = classDef.newInstance();
+
+            createFields(obj, obj2, circular);
+
+            return obj2;
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("Unable to find a class with that definition...");
+        } catch (InstantiationException ie) {
+            System.out.println("Unable to create new instance of selected object...");
+        } catch (IllegalAccessException iae) {
+            System.out.println("Unable to access desired class...");
+        }
+        return null;
+    }
+
+
+
     private void createFields(Object obj) {
         Field[] fields = obj.getClass().getDeclaredFields();
         System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " field(s), please enter the desired values when instructed");
@@ -58,12 +82,50 @@ public class ObjectCreator {
 
         for (Field field : fields) {
             // Handle required field types
+            // Primitive
             if (field.getType().isPrimitive()) {
                 createPrimitiveField(obj, field);
             }
+            // Array
             if (field.getType().isArray()) {
                 createArrayField(obj, field);
             }
+            // Circular reference
+            if (field.getType().equals(obj.getClass())) {
+                createCircularReference(obj, field);
+            }
+
+        }
+    }
+
+    private void createFields(Object obj1, Object obj, boolean circular) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " field(s), please enter the desired values when instructed");
+
+        for (Field field : fields) {
+            // Handle required field types
+            // Primitive
+            if (field.getType().isPrimitive()) {
+                createPrimitiveField(obj, field);
+            }
+            // Array
+            else if (field.getType().isArray()) {
+                createArrayField(obj, field);
+            }
+            // Circular reference
+            else if (field.getType().equals(obj.getClass())) {
+                if (circular)
+                    createCircularReference(obj1, field);
+                else {
+                    try {
+                        field.set(obj, obj1);
+                    } catch (IllegalAccessException iae) {
+                        System.out.println("Could not create a circular referecnt");
+                    }
+                }
+
+            }
+
         }
     }
 
@@ -75,7 +137,7 @@ public class ObjectCreator {
         String input = keyboard.nextLine();
 
         try {
-            // Tyr parsing user input to the fields type
+            // Try parsing user input to the fields type
             if (field.getType().equals(int.class)) {
                 int arg = Integer.parseInt(input);
                 field.set(obj, arg);
@@ -130,6 +192,31 @@ public class ObjectCreator {
         }
     }
 
+    private void createCircularReference(Object obj, Field field) {
+        System.out.println("The next field is also of type " +  obj.getClass().getSimpleName() + "... You have the following options");
+        System.out.println("[1] Reference the initial object and create a circular reference, or ");
+        System.out.println("[2] Create a another object of type " + obj.getClass().getSimpleName());
+        Scanner keyboard = new Scanner(System.in);
+        int input = keyboard.nextInt();
+
+
+        try {
+            if (input == 1) {
+
+                obj.getClass().getField(field.getName()).set(obj, createObject(obj, false));
+            } else {
+                // Create new object
+                obj.getClass().getField(field.getName()).set(obj, createObject(obj, true));
+            }
+        } catch (IllegalAccessException iae) {
+            System.out.println("Could not create circular reference");
+        } catch (NoSuchFieldException nsf) {
+            System.out.println("Could not access a field in a circular reference");
+        }
+
+
+
+    }
 
 
 }

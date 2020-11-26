@@ -3,7 +3,6 @@ package server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -28,6 +27,16 @@ public class Serializer {
             if (field.getType().isArray()) {
                 fields.put(serializeField(source, field));
                 objArray.put(serializeArray(source, field));
+
+            } else if (field.getType().equals(source.getClass())) {
+
+                try {
+                    fields.put(serializeField(source, field));
+                    objArray.put(objectToJson(field.get(source)));
+                } catch (IllegalAccessException iae) {
+                    System.out.println("Could not serialize ");
+                }
+
             } else {
                 fields.put(serializeField(source, field));
             }
@@ -41,6 +50,29 @@ public class Serializer {
         System.out.println(jsonContainer.toString(4));
 
         return jsonContainer.toString();
+    }
+
+    private static JSONObject objectToJson(Object source) {
+
+        JSONObject objectJson = new JSONObject();
+
+        objectJson.put("id", source.hashCode());
+        objectJson.put("type", "object");
+        objectJson.put("class", source.getClass().getName());
+
+        // Serialize source's fields
+        Field[] fs = source.getClass().getDeclaredFields();
+        JSONArray fields = new JSONArray();
+        for (Field field : fs) {
+            JSONObject aField = serializeField(source, field);
+            //System.out.println(aField.toString(4));
+            fields.put(aField);
+
+        }
+
+        objectJson.put("fields", fields);
+
+        return objectJson;
     }
 
     private static JSONObject serializeField(Object source, Field field) {
