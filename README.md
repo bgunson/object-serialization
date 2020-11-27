@@ -4,7 +4,7 @@
 Reflective Object Serialization Project
 
 This is a project that lets a user create 5 different objects and input their fields which is then 
-serialized to a JSON string. These operations take place on a artificial server. The serialized
+serialized to a JSON string. These operations take place on a theoretical server. The serialized
 object is then sent to a socket via a server socket where it gets deserialized and vizualized 
 on the client side. 
 
