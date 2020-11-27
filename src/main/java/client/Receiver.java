@@ -25,7 +25,7 @@ public class Receiver {
                 System.out.println("\nReceived a serialized object: ");
                 System.out.println(line);
                 System.out.println(" ");
-                Deserializer.deserializeObject(line);
+                //Deserializer.deserializeObject(line);
             }
 
 

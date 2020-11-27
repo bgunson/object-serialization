@@ -14,7 +14,7 @@ public class DeserializerTest {
 
     @org.junit.Before
     public void setUp() throws Exception {
-        this.testObjectA = new ObjectA(3, false);
+        this.testObjectA = new ObjectA(420, true);
         //this.testObjectB = new ObjectB();
         //this.testObjectC = new ObjectC();
         //this.testObjectD = new ObjectD();
@@ -23,9 +23,10 @@ public class DeserializerTest {
     @org.junit.Test
     public void deserializeObjectA() throws Exception {
         String serialized_object = Serializer.serializeObject(testObjectA);
-        Object deserialize_object = Deserializer.deserializeObject(serialized_object);
+        Object deserialized_object = Deserializer.deserializeObject(serialized_object);
 
-        assertEquals(testObjectD, deserialize_object);
+        assertEquals(Serializer.serializeObject(testObjectA), Serializer.serializeObject(deserialized_object));
+
     }
 
     @org.junit.Test
