@@ -1,11 +1,13 @@
 package client;
 
 import org.json.*;
-
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+
+
 
 public class Deserializer {
 
@@ -15,8 +17,6 @@ public class Deserializer {
         JSONArray object_list = jsonObject.getJSONArray("objects");
         Map object_map  = new HashMap();
         createInstances(object_map, object_list);
-        assignFieldValues(object_map, object_list);
-
         return object_map.get("0");
 
     }
@@ -25,47 +25,44 @@ public class Deserializer {
 
         for (int i = 0; i < object_list.length(); i++) {
             JSONObject object_info = object_list.getJSONObject(i);
-            if (object_info.get("type").equals("array"))
-                System.out.println("We found an array");
-            else {
+            if (object_info.get("type").equals("array")) {
+                Class type  = Class.forName(object_info.getString("class")).getComponentType();
+                int length = object_info.getInt("length");
+                Object array_instance = Array.newInstance(type, length);
+                object_map.put(object_info.get("id"), array_instance);
+                assignArrayValues(object_map, object_info);
+            } else {
                 Class object_class = Class.forName(object_info.getString("class"));
                 Constructor constructor = object_class.getDeclaredConstructor();
                 Object object_instance = constructor.newInstance();
                 object_map.put(object_info.get("id"), object_instance);
+                assignFieldValues(object_map, object_info);
             }
         }
 
     }
 
-    private static void assignFieldValues(Map object_map, JSONArray object_list) throws Exception {
+    private static void assignFieldValues(Map object_map, JSONObject object_info) throws Exception {
 
-        for (int i = 0; i < object_list.length(); i++) {
-            JSONObject object_info = object_list.getJSONObject(i);
-            JSONArray object_fields = object_info.getJSONArray("fields");
+        JSONArray object_fields = object_info.getJSONArray("fields");
 
-            Object object = object_map.get(object_info.get("id"));
+        Object object = object_map.get(object_info.get("id"));
 
-            for (int j = 0; j < object_fields.length(); j++) {
+        for (int j = 0; j < object_fields.length(); j++) {
 
-                JSONObject json_field = object_fields.getJSONObject(j);
-                String field_name = json_field.getString("name");
+            JSONObject json_field = object_fields.getJSONObject(j);
+            String field_name = json_field.getString("name");
 
-                Field field = object.getClass().getDeclaredField(field_name);
-                field.setAccessible(true);
+            Field field = object.getClass().getDeclaredField(field_name);
+            field.setAccessible(true);
 
-                if (field.getType().isPrimitive()) {
-                    // Found a primitive type field to be set
-                    assignPrimitiveFields(object, field, json_field);
-                } else if (field.getType().isArray()) {
-                    assignArrayField();
-                } else {
-                    field.set(object, object_map.get(json_field.get("reference")));
-                }
-
-
+            if (field.getType().isPrimitive()) {
+                // Found a primitive type field to be set
+                assignPrimitiveFields(object, field, json_field);
+            } else {    // Must be object since we have checked for arrays alreadys
+                field.set(object, object_map.get(json_field.get("reference")));
             }
         }
-
     }
 
     private static void assignPrimitiveFields(Object object, Field field, JSONObject json_field) throws Exception {
@@ -84,7 +81,25 @@ public class Deserializer {
 
     }
 
-    private static void assignArrayField() throws Exception {
+    private static void assignArrayValues(Map object_map, JSONObject object_info) throws Exception {
+        Object array_instance = object_map.get(object_info.get("id"));
+        JSONArray entries = object_info.getJSONArray("entries");
+
+        int length = Array.getLength(array_instance);
+
+        for (int i = 0; i < length; i++) {
+
+            if (array_instance.getClass().getComponentType().isPrimitive()) {
+                Array.set(array_instance, i, entries.getJSONObject(i).get("value"));
+            } else {
+                if (entries.getJSONObject(i).get("reference").equals("null"))
+                    Array.set(array_instance, i, null);
+                else
+                    Array.set(array_instance, i, object_map.get(entries.getJSONObject(i).get("reference")));
+            }
+
+        }
+
     }
 
 

@@ -96,7 +96,7 @@ public class Serializer {
 
         JSONObject jsonArray = new JSONObject();
         field.setAccessible(true);
-        jsonArray.put("class", field.getType());
+        jsonArray.put("class", field.get(source).getClass().getName());
 
         jsonArray.put("id", object_tracking_map.get(field.get(source)));
         jsonArray.put("type", "array");
