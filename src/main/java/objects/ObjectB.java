@@ -2,7 +2,7 @@ package objects;
 
 public class ObjectB {
 
-    public ObjectB other;
+    private ObjectB other;
 
 
 }

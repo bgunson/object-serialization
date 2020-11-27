@@ -54,6 +54,8 @@ public class ObjectCreator {
 
     private void createObjectField(Object obj, Field field, ArrayList object_list) throws Exception {
 
+        field.setAccessible(true);
+
         if (objectListContainsType(object_list, field.getType())) {
             // Encountered a field whose class has been created before
             System.out.println("Would you like to...");
@@ -130,6 +132,7 @@ public class ObjectCreator {
     }
 
     private void createArrayField(Object obj, Field field, ArrayList object_list) throws Exception {
+        field.setAccessible(true);
         Scanner keyboard = new Scanner(System.in);
         System.out.println("Encountered an array field of type " + field.getType().getComponentType() + ", enter the desired length");
         System.out.println("length = ");

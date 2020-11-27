@@ -2,7 +2,7 @@ package objects;
 
 public class ObjectA {
 
-    public int a;
-    public boolean b;
+    private int a;
+    private boolean b;
 
 }

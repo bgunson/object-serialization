@@ -47,7 +47,7 @@ public class Serializer {
                 if (field.getType().isArray()) {
                     // Add to object list
                     object_tracking_map.put(field.get(source), object_tracking_map.size());
-                    //json_fields.put(serializeField(source, field, object_tracking_map));
+                    json_fields.put(serializeField(source, field, object_tracking_map));
                     object_list.put(serializeArray(source, field, object_list, object_tracking_map));
 
                 } else if (!field.getType().isPrimitive()) {    // Check if field is some other object

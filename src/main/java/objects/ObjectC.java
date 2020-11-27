@@ -2,7 +2,7 @@ package objects;
 
 public class ObjectC {
 
-    public int[] array;
+    private int[] array;
 
 
 }
