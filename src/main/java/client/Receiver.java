@@ -8,8 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class Receiver {
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws Exception {
 
         String hostname = "localhost";
         int port = 6868;
@@ -20,10 +19,13 @@ public class Receiver {
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
             while (true) {
-                String time = reader.readLine();
+                System.out.println("Waiting for serialized object...");
+                String line = reader.readLine();
 
-                System.out.println("Received a serialized object: ");
-                System.out.println(time);
+                System.out.println("\nReceived a serialized object: ");
+                System.out.println(line);
+                System.out.println(" ");
+                Deserializer.deserializeObject(line);
             }
 
 
