@@ -24,33 +24,47 @@ public class DeserializerTest {
     public void deserializeObjectA() throws Exception {
         System.out.println("==========================================================");
         System.out.println("Testing deserializer for ObjectA...\n");
+        System.out.println("EXPECTED");
         String serialized_object = Serializer.serializeObject(testObjectA);
         Object deserialized_object = Deserializer.deserializeObject(serialized_object);
 
-        assertEquals(Serializer.serializeObject(testObjectA), Serializer.serializeObject(deserialized_object));
+        String expected = serialized_object;
+        System.out.println("ACTUAL");
+        String actual = Serializer.serializeObject(deserialized_object);
+
+        assertEquals(expected, actual);
         System.out.println("==========================================================");
     }
 
     @org.junit.Test
     public void deserializeObjectB() throws Exception {
         System.out.println("==========================================================");
-        System.out.println("Testing deserializer for ObjectB...\n");
+        System.out.println("Testing deserializer for ObjectA...\n");
+        System.out.println("EXPECTED");
         String serialized_object = Serializer.serializeObject(testObjectB);
         Object deserialized_object = Deserializer.deserializeObject(serialized_object);
 
-        assertEquals(Serializer.serializeObject(testObjectB), Serializer.serializeObject(deserialized_object));
+        String expected = serialized_object;
+        System.out.println("ACTUAL");
+        String actual = Serializer.serializeObject(deserialized_object);
+
+        assertEquals(expected, actual);
         System.out.println("==========================================================");
     }
 
     @org.junit.Test
     public void deserializeObjectC() throws Exception {
         System.out.println("==========================================================");
-        System.out.println("Testing deserializer for ObjectC...\n");
-
+        System.out.println("Testing deserializer for ObjectA...\n");
+        System.out.println("EXPECTED");
         String serialized_object = Serializer.serializeObject(testObjectC);
         Object deserialized_object = Deserializer.deserializeObject(serialized_object);
 
-        assertEquals(Serializer.serializeObject(testObjectC), Serializer.serializeObject(deserialized_object));
+        String expected = serialized_object;
+        System.out.println("ACTUAL");
+        String actual = Serializer.serializeObject(deserialized_object);
+
+        assertEquals(expected, actual);
         System.out.println("==========================================================");
 
     }
