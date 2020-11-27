@@ -11,6 +11,12 @@ import java.util.Map;
 
 public class Deserializer {
 
+    /**
+     * The base method for this class which starts the work of deserializing a given object
+     * @param source the object which we are deserializing
+     * @return the deserialized object
+     * @throws Exception
+     */
     public static Object deserializeObject(String source) throws Exception {
 
         JSONObject jsonObject = new JSONObject(source);
@@ -21,6 +27,14 @@ public class Deserializer {
 
     }
 
+    /**
+     * This method will iterate through the JSONArray storing the serialized objects and create an instance accordingly.
+     * Regular objects are handled differently from arrays and uses different methods.
+     * @param object_map a map tracking the objects we have instantiated
+     * @param object_list the JSONArray from the base JSONObject that contains the base object and its referenced objects
+     *                    (if any)
+     * @throws Exception
+     */
     private static void createInstances(Map object_map, JSONArray object_list) throws Exception {
 
         for (int i = 0; i < object_list.length(); i++) {
@@ -31,7 +45,7 @@ public class Deserializer {
                 Object array_instance = Array.newInstance(type, length);
                 object_map.put(object_info.get("id"), array_instance);
                 assignArrayValues(object_map, object_info);
-            } else {
+            } else {    // It must be some object if not array
                 Class object_class = Class.forName(object_info.getString("class"));
                 Constructor constructor = object_class.getDeclaredConstructor();
                 Object object_instance = constructor.newInstance();
@@ -42,6 +56,12 @@ public class Deserializer {
 
     }
 
+    /**
+     * This method will set a newly instantiated object's fields, if that object is not an array
+     * @param object_map the map storing the created objects
+     * @param object_info the specific JSONObject whose fields we are setting
+     * @throws Exception
+     */
     private static void assignFieldValues(Map object_map, JSONObject object_info) throws Exception {
 
         JSONArray object_fields = object_info.getJSONArray("fields");
@@ -65,6 +85,14 @@ public class Deserializer {
         }
     }
 
+    /**
+     * When a primitive type field is encountered, this method will try to set the field to the correct type from
+     * a given json object
+     * @param object The object whose field we are setting
+     * @param field the particular field we are setting
+     * @param json_field the JSONObject where we are getting the value to be set from
+     * @throws Exception
+     */
     private static void assignPrimitiveFields(Object object, Field field, JSONObject json_field) throws Exception {
         Class field_type = field.getType();
         if (field_type.equals(int.class)) {
@@ -81,6 +109,13 @@ public class Deserializer {
 
     }
 
+    /**
+     * When an array type field or object is encountered, this method will create and set the array and its entries
+     * for the object
+     * @param object_map the map tracking the objects that have been deserialized
+     * @param object_info the JSONObject where we are getting the array's values or references from
+     * @throws Exception
+     */
     private static void assignArrayValues(Map object_map, JSONObject object_info) throws Exception {
         Object array_instance = object_map.get(object_info.get("id"));
         JSONArray entries = object_info.getJSONArray("entries");

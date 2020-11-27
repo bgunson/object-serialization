@@ -11,6 +11,13 @@ import java.util.Map;
 
 public class Serializer {
 
+    /**
+     * This is the base method for the class. When called the method will take an object and begin serializing it to
+     * a JSONObject as defined by the library org.json
+     * @param source the object we are serializing
+     * @return a string representing the JSONObject which was created
+     * @throws Exception
+     */
     public static String serializeObject(Object source) throws Exception{
 
         JSONArray object_list = new JSONArray();
@@ -25,6 +32,15 @@ public class Serializer {
         return json_container.toString();
     }
 
+    /**
+     * Helper method that can serialize other objects encountered while serializing the source object. The method
+     * does not handle array objects.
+     * @param source the object we are serializing
+     * @param object_list a JSONArray where we are storing all encountered objects, later put in a json container object
+     * @param object_tracking_map a map where we can store objects encountered and later check if an object has been
+     *                            serialized or not already
+     * @throws Exception
+     */
     private static void serializeHelper(Object source, JSONArray object_list, Map object_tracking_map) throws Exception {
 
         if (source != null) {
@@ -68,6 +84,13 @@ public class Serializer {
     }
 
 
+    /**
+     * This method creates a separate JSONObject for a given objects field
+     * @param source the object whose field we are serializing
+     * @param field the field we are serializing
+     * @param object_tracking_map the map tracking encounters objects
+     * @return a JSONObject representing the serialized field
+     */
     private static JSONObject serializeField(Object source, Field field, Map object_tracking_map) {
         field.setAccessible(true);
         JSONObject jsonField = new JSONObject();
@@ -91,6 +114,15 @@ public class Serializer {
 
     }
 
+    /**
+     * When an array object is encountered, this method will serialize it and its entries as a JSONObject
+     * @param source the source object which contains this array field
+     * @param field the field which is an array type
+     * @param object_list the JSONArray storing serialized objects which we can add the array field to
+     * @param object_tracking_map the map tracking all encountered objects
+     * @return the JSONObject representing the serialized array
+     * @throws Exception
+     */
     private static JSONObject serializeArray(Object source, Field field, JSONArray object_list, Map object_tracking_map)
         throws  Exception {
 

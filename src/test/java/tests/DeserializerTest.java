@@ -18,7 +18,7 @@ public class DeserializerTest {
         this.testObjectA = new ObjectA(420, true);
         this.testObjectB = new ObjectB(new ObjectB(new ObjectB(testObjectB)));
         this.testObjectC = new ObjectC(new int[] {1,234,6,43,57});
-        this.testObjectD = new ObjectD(new ObjectA[] {null, null, new ObjectA(0, false), null});
+        this.testObjectD = new ObjectD(new ObjectA[] {new ObjectA(734676, true), null, new ObjectA(-4324, false), null});
     }
 
     @org.junit.Test

@@ -16,6 +16,11 @@ public class ObjectCreator {
         " - An object that uses a Java Collection class to refer to other objects"
     };
 
+    /**
+     * Initial method called when a user wishes to create an object. Displays the menu showing object options
+     * @return the specific object the user chose to create, with assigned fields
+     * @throws Exception
+     */
     public Object createObject() throws Exception {
 
         System.out.println("Choose an object you wish to create...");
@@ -39,6 +44,14 @@ public class ObjectCreator {
 
     }
 
+    /**
+     * A helper method which is used by createObject and anytime an object has a field that is a reference
+     * to another object.
+     * @param c the class definition for the object to be created
+     * @param object_list an array list tracking created objects (mostly used for circular refs)
+     * @return the object created after fields have been assigned
+     * @throws Exception
+     */
     private Object createObjectHelper(Class c, ArrayList object_list) throws Exception {
 
         Object obj = c.newInstance();
@@ -47,6 +60,13 @@ public class ObjectCreator {
         return obj;
     }
 
+    /**
+     * This method when called for a specific object's field will set that field based on user input
+     * @param obj the source object that the field belongs to
+     * @param field the specific field that is being set
+     * @param object_list a list tracking already created objects
+     * @throws Exception
+     */
     private void createObjectField(Object obj, Field field, ArrayList object_list) throws Exception {
 
         field.setAccessible(true);
@@ -73,7 +93,12 @@ public class ObjectCreator {
 
     }
 
-
+    /**
+     * This method will iterate through a given object's declared fields and set them accordingly
+     * @param obj the source object the user chose which is having its declared fields set
+     * @param object_list the object tracking list
+     * @throws Exception
+     */
     private void createFields(Object obj, ArrayList object_list) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " field(s), please enter the desired values when instructed");
@@ -96,7 +121,12 @@ public class ObjectCreator {
         }
     }
 
-
+    /**
+     * When a primitive typed field is encountered this method parses System input to the desired type
+     * @param c the desired primitive class
+     * @return the parsed object from System.in
+     * @throws Exception
+     */
     private Object getPrimitive(Class c) throws Exception {
 
         Scanner keyboard = new Scanner(System.in);
@@ -126,6 +156,14 @@ public class ObjectCreator {
         return null;
     }
 
+    /**
+     * When an array type field is encountered, this method will ask the user for a length then create an array
+     * and ask the user to input the arrays elements one at a time.
+     * @param obj the source object who has an array type field
+     * @param field the field that is the array
+     * @param object_list the object tracking list
+     * @throws Exception
+     */
     private void createArrayField(Object obj, Field field, ArrayList object_list) throws Exception {
         field.setAccessible(true);
         Scanner keyboard = new Scanner(System.in);
@@ -161,6 +199,12 @@ public class ObjectCreator {
         field.set(obj, fieldArr);
     }
 
+    /**
+     * Utility method to check if the object tracking list contains an object of a given type
+     * @param list the array list tracking created objects at this point
+     * @param c the class definition we are looking for in the list
+     * @return
+     */
     private boolean objectListContainsType(ArrayList list, Class c) {
         for (Object obj: list) {
             if (obj.getClass().equals(c))
