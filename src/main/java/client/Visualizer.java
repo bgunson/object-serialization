@@ -1,14 +1,16 @@
 package client;
 
-import server.Serializer;
-
 import java.lang.reflect.*;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
- *  Visulizer class is a modified version of my INspector from CPSC501 A2 - Fall 2020
+ *  Visulizer class is a modified version of my Inspector from CPSC501 A2 - Fall 2020
  *  Bennett Gunson - 30041789
+ *
+ *  The inspection of superclasses and interfaces has been disabled to make the output more readable, the reason being
+ *  we care more about the deserialization of the object by seeing that its fields were retained and not so much
+ *  about its super classes or interfaces (of which there are none in the five example objects).
  */
 
 public class Visualizer {
