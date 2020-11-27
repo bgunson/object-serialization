@@ -1,12 +1,12 @@
 package server;
 
-import objects.ObjectC;
+
+
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.Map;
+
 import java.util.Scanner;
 
 
@@ -81,10 +81,13 @@ public class ObjectCreator {
         Field[] fields = obj.getClass().getDeclaredFields();
         System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " field(s), please enter the desired values when instructed");
         for (Field field : fields) {
+            field.setAccessible(true);
             // Handle required field types
             // Primitive
             if (field.getType().isPrimitive()) {
-                createPrimitiveField(obj, field);
+                System.out.println("Enter value for: ");
+                System.out.println(field.getType() + " " + field.getName() + " = ");
+                field.set(obj, getPrimitive(field.getType()));
             }
             // Array
             else if (field.getType().isArray()) {
@@ -97,43 +100,36 @@ public class ObjectCreator {
     }
 
 
-    private void createPrimitiveField(Object obj, Field field) {
+    private Object getPrimitive(Class c) throws Exception {
 
         Scanner keyboard = new Scanner(System.in);
-        System.out.println("Enter value for: ");
-        System.out.println(field.getType() + " " + field.getName() + " = ");
         String input = keyboard.nextLine();
 
-        try {
-            // Try parsing user input to the fields type
-            if (field.getType().equals(int.class)) {
-                int arg = Integer.parseInt(input);
-                field.set(obj, arg);
-            } else if (field.getType().equals(boolean.class)) {
-                boolean arg = Boolean.parseBoolean(input);
-                field.set(obj, arg);
-            } else if (field.getType().equals(short.class)) {
-                short arg = Short.parseShort(input);
-                field.set(obj, arg);
-            } else if (field.getType().equals(long.class)) {
-                long arg = Long.parseLong(input);
-                field.set(obj, arg);
-            } else if (field.getType().equals(float.class)) {
-                float arg = Float.parseFloat(input);
-                field.set(obj, arg);
-            } else if (field.getType().equals(double.class)) {
-                double arg = Double.parseDouble(input);
-                field.set(obj, arg);
-            } else if (field.getType().equals(byte.class)) {
-                byte arg = Byte.parseByte(input);
-                field.set(obj, arg);
-            }
-        } catch (IllegalAccessException iae) {
-            System.out.println("Could not access that field...");
+        // Try parsing user input to the fields type
+        if (c.equals(int.class)) {
+            return Integer.parseInt(input);
+
+        } else if (c.equals(boolean.class)) {
+            return Boolean.parseBoolean(input);
+
+        } else if (c.equals(short.class)) {
+            return Short.parseShort(input);
+
+        } else if (c.equals(long.class)) {
+            return Long.parseLong(input);
+
+        } else if (c.equals(float.class)) {
+            return Float.parseFloat(input);
+
+        } else if (c.equals(double.class)) {
+            return Double.parseDouble(input);
+        } else if (c.equals(byte.class)) {
+            return Byte.parseByte(input);
         }
+        return null;
     }
 
-    private void createArrayField(Object obj, Field field, ArrayList object_list) throws Exception{
+    private void createArrayField(Object obj, Field field, ArrayList object_list) throws Exception {
         Scanner keyboard = new Scanner(System.in);
         System.out.println("Encountered an array field of type " + field.getType().getComponentType() + ", enter the desired length");
         System.out.println("length = ");
@@ -161,8 +157,7 @@ public class ObjectCreator {
                 }
 
             } else {    // Array is primitive
-                int input = keyboard.nextInt();
-                Array.set(fieldArr, i, input);
+                Array.set(fieldArr, i, getPrimitive(arrayType));
             }
         }
         field.set(obj, fieldArr);
