@@ -44,14 +44,21 @@ public class Deserializer {
                 int length = object_info.getInt("length");
                 Object array_instance = Array.newInstance(type, length);
                 object_map.put(object_info.get("id"), array_instance);
-                assignArrayValues(object_map, object_info);
             } else {    // It must be some object if not array
                 Class object_class = Class.forName(object_info.getString("class"));
                 Constructor constructor = object_class.getDeclaredConstructor();
                 Object object_instance = constructor.newInstance();
                 object_map.put(object_info.get("id"), object_instance);
-                assignFieldValues(object_map, object_info);
             }
+        }
+        // We need to loop again to assign fields since a field may be a ref to an object that hasnt been added to
+        // the map yet
+        for (int i = 0; i < object_list.length(); i++) {
+            JSONObject object_info = object_list.getJSONObject(i);
+            if (object_info.get("type").equals("array"))
+                assignArrayValues(object_map, object_info);
+            else
+                assignFieldValues(object_map, object_info);
         }
 
     }
@@ -78,7 +85,7 @@ public class Deserializer {
 
             if (field.getType().isPrimitive()) {
                 // Found a primitive type field to be set
-                assignPrimitiveFields(object, field, json_field);
+                assignPrimitiveField(object, field, json_field);
             } else {    // Must be object since we have checked for arrays alreadys
                 field.set(object, object_map.get(json_field.get("reference")));
             }
@@ -93,7 +100,7 @@ public class Deserializer {
      * @param json_field the JSONObject where we are getting the value to be set from
      * @throws Exception
      */
-    private static void assignPrimitiveFields(Object object, Field field, JSONObject json_field) throws Exception {
+    private static void assignPrimitiveField(Object object, Field field, JSONObject json_field) throws Exception {
         Class field_type = field.getType();
         if (field_type.equals(int.class)) {
             field.set(object, json_field.getInt("value"));
