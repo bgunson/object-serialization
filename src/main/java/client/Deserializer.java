@@ -101,17 +101,11 @@ public class Deserializer {
      */
     private static void assignPrimitiveField(Object object, Field field, JSONObject json_field) throws Exception {
         Class field_type = field.getType();
-        if (field_type.equals(int.class)) {
-            field.set(object, json_field.getInt("value"));
-        } else if (field_type.equals(boolean.class)) {
-            field.setBoolean(object, json_field.getBoolean("value"));
-        } else if (field_type.equals(float.class)) {
-            field.setFloat(object, json_field.getFloat("value"));
-        } else if (field_type.equals(long.class)) {
-            field.setLong(object, json_field.getLong("value"));
-        } else if (field_type.equals(double.class)) {
-            field.setDouble(object, json_field.getDouble("value"));
-        }
+        if (field_type.equals(int.class)) { field.set(object, json_field.getInt("value")); }
+        else if (field_type.equals(boolean.class)) { field.setBoolean(object, json_field.getBoolean("value")); }
+        else if (field_type.equals(float.class)) { field.setFloat(object, json_field.getFloat("value")); }
+        else if (field_type.equals(long.class)) { field.setLong(object, json_field.getLong("value")); }
+        else if (field_type.equals(double.class)) { field.setDouble(object, json_field.getDouble("value")); }
 
     }
 
