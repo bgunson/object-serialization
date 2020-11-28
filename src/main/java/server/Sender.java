@@ -7,6 +7,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * This class structure is derived from https://www.codejava.net/java-se/networking/java-socket-server-examples-tcp-ip
+ */
+
 public class Sender {
 
     public static void main(String[] args) throws Exception{

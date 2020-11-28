@@ -8,6 +8,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+/**
+ * This class structure is derived from https://www.codejava.net/java-se/networking/java-socket-server-examples-tcp-ip
+ */
+
 public class Receiver {
     public static void main(String[] args) throws Exception {
         Scanner keyboard = new Scanner(System.in);

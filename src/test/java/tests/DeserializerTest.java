@@ -29,6 +29,7 @@ public class DeserializerTest {
         testArrayE.add(null);
         System.out.println(testArrayE);
         this.testObjectE = new ObjectE(testArrayE);
+
     }
 
     @org.junit.Test
