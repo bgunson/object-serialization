@@ -1,13 +1,8 @@
 package server;
 
-import org.json.JSONObject;
-import org.json.JSONArray;
-
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
@@ -16,7 +11,9 @@ public class Sender {
 
     public static void main(String[] args) throws Exception{
 
-        int port = 6868;
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Enter a port:");
+        int port = keyboard.nextInt();
 
         try  {
 
@@ -24,7 +21,6 @@ public class Sender {
 
             System.out.println("Server is listening on port " + port);
 
-            Scanner keyboard = new Scanner(System.in);
             boolean finished = false;
 
             Socket socket = serverSocket.accept();

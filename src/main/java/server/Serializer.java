@@ -1,9 +1,7 @@
 package server;
 
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -17,7 +15,6 @@ public class Serializer {
      * a JSONObject as defined by the library org.json
      * @param source the object we are serializing
      * @return a string representing the JSONObject which was created
-     * @throws Exception
      */
     public static String serializeObject(Object source) throws Exception{
 
@@ -40,7 +37,6 @@ public class Serializer {
      * @param object_list a JSONArray where we are storing all encountered objects, later put in a json container object
      * @param object_tracking_map a map where we can store objects encountered and later check if an object has been
      *                            serialized or not already
-     * @throws Exception
      */
     private static void serializeHelper(Object source, JSONArray object_list, Map object_tracking_map) throws Exception {
 
@@ -122,7 +118,6 @@ public class Serializer {
      * @param object_list the JSONArray storing serialized objects which we can add the array field to
      * @param object_tracking_map the map tracking all encountered objects
      * @return the JSONObject representing the serialized array
-     * @throws Exception
      */
     private static JSONObject serializeArray(Object source, Field field, JSONArray object_list, Map object_tracking_map)
         throws  Exception {

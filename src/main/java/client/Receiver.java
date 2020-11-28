@@ -6,12 +6,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class Receiver {
     public static void main(String[] args) throws Exception {
-
-        String hostname = "localhost";
-        int port = 6868;
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Enter a host name:");
+        String hostname = keyboard.nextLine();
+        System.out.println("Enter a port: ");
+        int port = keyboard.nextInt();
 
         try  {
             Socket socket = new Socket(hostname, port);

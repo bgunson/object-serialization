@@ -16,7 +16,6 @@ public class Deserializer {
      * The base method for this class which starts the work of deserializing a given object
      * @param source the object which we are deserializing
      * @return the deserialized object
-     * @throws Exception
      */
     public static Object deserializeObject(String source) throws Exception {
 
@@ -34,7 +33,6 @@ public class Deserializer {
      * @param object_map a map tracking the objects we have instantiated
      * @param object_list the JSONArray from the base JSONObject that contains the base object and its referenced objects
      *                    (if any)
-     * @throws Exception
      */
     private static void createInstances(Map object_map, JSONArray object_list) throws Exception {
 
@@ -68,7 +66,6 @@ public class Deserializer {
      * This method will set a newly instantiated object's fields, if that object is not an array
      * @param object_map the map storing the created objects
      * @param object_info the specific JSONObject whose fields we are setting
-     * @throws Exception
      */
     private static void assignFieldValues(Map object_map, JSONObject object_info) throws Exception {
 
@@ -101,7 +98,6 @@ public class Deserializer {
      * @param object The object whose field we are setting
      * @param field the particular field we are setting
      * @param json_field the JSONObject where we are getting the value to be set from
-     * @throws Exception
      */
     private static void assignPrimitiveField(Object object, Field field, JSONObject json_field) throws Exception {
         Class field_type = field.getType();
@@ -124,7 +120,6 @@ public class Deserializer {
      * for the object
      * @param object_map the map tracking the objects that have been deserialized
      * @param object_info the JSONObject where we are getting the array's values or references from
-     * @throws Exception
      */
     private static void assignArrayValues(Map object_map, JSONObject object_info) throws Exception {
         Object array_instance = object_map.get(object_info.get("id"));

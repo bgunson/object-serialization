@@ -47,8 +47,7 @@ public class ObjectCreator {
 
         Class classDef = Class.forName("objects." + objName);
         ArrayList<Object> object_list = new ArrayList<Object>();
-        Object object = createObjectHelper(classDef, object_list);
-        return object;
+        return createObjectHelper(classDef, object_list);
 
     }
 
@@ -151,7 +150,6 @@ public class ObjectCreator {
      * @param obj the source object who has an array type field
      * @param field the field that is the array
      * @param object_list the object tracking list
-     * @throws Exception
      */
     private void createArrayField(Object obj, Field field, ArrayList object_list) throws Exception {
         field.setAccessible(true);
