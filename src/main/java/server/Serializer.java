@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -57,23 +58,25 @@ public class Serializer {
 
             for (Field field : fields) {
                 // Check if field is an array
-                field.setAccessible(true);
+                if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
+                    field.setAccessible(true);
 
-                if (field.getType().isArray()) {
-                    // Add to object list
-                    object_tracking_map.put(field.get(source), object_tracking_map.size());
-                    json_fields.put(serializeField(source, field, object_tracking_map));
-                    object_list.put(serializeArray(source, field, object_list, object_tracking_map));
+                    if (field.getType().isArray()) {
+                        // Add to object list
+                        object_tracking_map.put(field.get(source), object_tracking_map.size());
+                        json_fields.put(serializeField(source, field, object_tracking_map));
+                        object_list.put(serializeArray(source, field, object_list, object_tracking_map));
 
-                } else if (!field.getType().isPrimitive()) {    // Check if field is some other object
-                    // Check if the specified field has been serialized
-                    if (!object_tracking_map.containsKey(field.get(source))) {
-                        serializeHelper(field.get(source), object_list, object_tracking_map);
+                    } else if (!field.getType().isPrimitive()) {    // Check if field is some other object
+                        // Check if the specified field has been serialized
+                        if (!object_tracking_map.containsKey(field.get(source))) {
+                            serializeHelper(field.get(source), object_list, object_tracking_map);
+                        }
+                        json_fields.put(serializeField(source, field, object_tracking_map));
+
+                    } else {    // Field must be primitive at this point
+                        json_fields.put(serializeField(source, field, object_tracking_map));
                     }
-                    json_fields.put(serializeField(source, field, object_tracking_map));
-
-                } else {    // Field must be primitive at this point
-                    json_fields.put(serializeField(source, field, object_tracking_map));
                 }
             }
 
@@ -91,24 +94,22 @@ public class Serializer {
      * @param object_tracking_map the map tracking encounters objects
      * @return a JSONObject representing the serialized field
      */
-    private static JSONObject serializeField(Object source, Field field, Map object_tracking_map) {
+    private static JSONObject serializeField(Object source, Field field, Map object_tracking_map) throws  Exception {
         field.setAccessible(true);
         JSONObject jsonField = new JSONObject();
         jsonField.put("name", field.getName());
         jsonField.put("declaringclass", field.getDeclaringClass().getSimpleName());
 
-        try {
-            if (field.getType().isPrimitive()) {
-                jsonField.put("value", field.get(source));
-            } else {
-                Object ref = object_tracking_map.get(field.get(source));
-                if (ref == null)
-                    jsonField.put("reference", "null");
-                else
-                    jsonField.put("reference", ref);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+
+        if (field.getType().isPrimitive()) {
+            jsonField.put("value", field.get(source));
+        } else {
+            Object ref = object_tracking_map.get(field.get(source));
+            if (ref == null)
+                jsonField.put("reference", "null");
+            else
+                jsonField.put("reference", ref);
+
         }
         return jsonField;
 

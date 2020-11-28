@@ -69,7 +69,7 @@ public class Visualizer {
         }*/
 
         // Constructor
-        Constructor[] constructorArr = c.getDeclaredConstructors();
+        /*Constructor[] constructorArr = c.getDeclaredConstructors();
         System.out.println(indent + "CONSTRUCTORS ( " + c.getName() + " )");
 
         if (constructorArr.length == 0)
@@ -79,10 +79,10 @@ public class Visualizer {
             for (Constructor constructor : constructorArr) {
                 inspectConstructor(constructor, depth + 1);
             }
-        }
+        }*/
 
         // Methods
-        Method[] cMethods = c.getDeclaredMethods();
+        /*Method[] cMethods = c.getDeclaredMethods();
         System.out.println(indent + "METHODS ( " + c.getName() + " )");
 
         if (cMethods.length == 0)
@@ -91,7 +91,7 @@ public class Visualizer {
             System.out.println(indent + "Methods ->");
             for (Method method : cMethods)
                 inspectMethod(method, depth + 1);
-        }
+        }*/
 
         // Fields
         Field[] fields = c.getDeclaredFields();
@@ -146,29 +146,30 @@ public class Visualizer {
         String indent = getIndent(depth);
         String indent2 = indent + " ";
 
-        System.out.println(indent + "FIELD");
-        System.out.println(indent2 + "Name: " + f.getName());
-        System.out.println(indent2 + "Type: " + f.getType());
-        System.out.println(indent2 + "Modifiers: " + Modifier.toString(f.getModifiers()));
+        if (!Modifier.isStatic(f.getModifiers()) && !Modifier.isFinal(f.getModifiers())) {
+            System.out.println(indent + "FIELD");
+            System.out.println(indent2 + "Name: " + f.getName());
+            System.out.println(indent2 + "Type: " + f.getType());
+            System.out.println(indent2 + "Modifiers: " + Modifier.toString(f.getModifiers()));
 
-        f.setAccessible(true);
-        Object value = f.get(obj);
+            f.setAccessible(true);
+            Object value = f.get(obj);
 
-        if (value.getClass().isArray())
-            inspectArray(value, depth + 1);
-        else {
+            if (value.getClass().isArray())
+                inspectArray(value, depth + 1);
+            else {
 
-            if (!f.getType().isPrimitive()) {
-                System.out.println(indent2 + "Value (ref): " + value);
-                if (!object_tracking_map.containsKey(value)) {
-                    System.out.println(indent2 + "  -> Recursively Inspect");
-                    inspectClass(value.getClass(), value, depth + 4);
-                } else {
-                    System.out.println(indent2 + "  -> Already Inspected");
-                }
+                if (!f.getType().isPrimitive()) {
+                    System.out.println(indent2 + "Value (ref): " + value);
+                    if (!object_tracking_map.containsKey(value)) {
+                        System.out.println(indent2 + "  -> Recursively Inspect");
+                        inspectClass(value.getClass(), value, depth + 4);
+                    } else {
+                        System.out.println(indent2 + "  -> Already Inspected");
+                    }
+                } else
+                    System.out.println(indent2 + "Value: " + value);
             }
-            else
-                System.out.println(indent2 + "Value: " + value);
         }
     }
 

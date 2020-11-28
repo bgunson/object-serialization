@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class ObjectCreator {
 
+    private boolean isCollection;
     private final String[] objects = {"ObjectA", "ObjectB", "ObjectC", "ObjectD", "ObjectE"};
     private final String[] objInfo = {
         " - A simple object with primitive instance variables",
@@ -17,12 +18,10 @@ public class ObjectCreator {
     };
 
     /**
-     * Initial method called when a user wishes to create an object. Displays the menu showing object options
-     * @return the specific object the user chose to create, with assigned fields
-     * @throws Exception
+     * Gives the user option to create one of five objects, gets users choice
+     * @return the name of the object the user chose
      */
-    public Object createObject() throws Exception {
-
+    private String promptUser() {
         System.out.println("Choose an object you wish to create...");
         for (int i = 0; i < objects.length; i++)
             System.out.println("[" + (i + 1) + "] " + objects[i] + objInfo[i]);
@@ -32,10 +31,19 @@ public class ObjectCreator {
         String input = keyboard.nextLine();
         int selection = Integer.parseInt(input);
 
-        String objName = objects[selection - 1];
+        return objects[selection - 1];
+    }
 
+    /**
+     * Initial method called when a user wishes to create an object. Displays the menu showing object options
+     * @return the specific object the user chose to create, with assigned fields
+     */
+    public Object createObject() throws Exception {
+
+        String objName = promptUser();
         System.out.println("Creating a new " + objName + "...\n");
-
+        if (objName.equals("ObjectE"))
+            isCollection = true;
 
         Class classDef = Class.forName("objects." + objName);
         ArrayList<Object> object_list = new ArrayList<Object>();
@@ -50,7 +58,6 @@ public class ObjectCreator {
      * @param c the class definition for the object to be created
      * @param object_list an array list tracking created objects (mostly used for circular refs)
      * @return the object created after fields have been assigned
-     * @throws Exception
      */
     private Object createObjectHelper(Class c, ArrayList object_list) throws Exception {
 
@@ -65,7 +72,6 @@ public class ObjectCreator {
      * @param obj the source object that the field belongs to
      * @param field the specific field that is being set
      * @param object_list a list tracking already created objects
-     * @throws Exception
      */
     private void createObjectField(Object obj, Field field, ArrayList object_list) throws Exception {
 
@@ -82,12 +88,11 @@ public class ObjectCreator {
                 // Add another object to the path
                 field.set(obj, createObjectHelper(field.getType(), object_list));
             } else if (input == 2) {
-                // Circle back
-                field.set(obj, object_list.get(0));
+                field.set(obj, object_list.get(0)); // Circle back
             }
         } else {
-            System.out.println("Encountered a field whose class is new to us");
-
+            // Encountered some object that is new to us
+            field.set(obj, createObjectHelper(field.getType(), object_list));
         }
 
 
@@ -97,26 +102,26 @@ public class ObjectCreator {
      * This method will iterate through a given object's declared fields and set them accordingly
      * @param obj the source object the user chose which is having its declared fields set
      * @param object_list the object tracking list
-     * @throws Exception
      */
     private void createFields(Object obj, ArrayList object_list) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
-        System.out.println(obj.getClass().getSimpleName() + " has " + fields.length + " field(s), please enter the desired values when instructed");
+        System.out.println("Enter field(s) for " + obj.getClass().getSimpleName());
         for (Field field : fields) {
             field.setAccessible(true);
             // Handle required field types
-            // Primitive
-            if (field.getType().isPrimitive()) {
-                System.out.println("Enter value for: ");
-                System.out.println(field.getType() + " " + field.getName() + " = ");
-                field.set(obj, getPrimitive(field.getType()));
-            }
-            // Array
-            else if (field.getType().isArray()) {
-                createArrayField(obj, field, object_list);
-            } else {
-                createObjectField(obj, field, object_list);
-
+            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
+                // Primitive
+                if (field.getType().isPrimitive()) {
+                    System.out.println("Enter value for: ");
+                    System.out.println(field.getType() + " " + field.getName() + " = ");
+                    field.set(obj, getPrimitive(field.getType()));
+                }
+                // Array
+                else if (field.getType().isArray()) {
+                    createArrayField(obj, field, object_list);
+                } else {
+                    createObjectField(obj, field, object_list);
+                }
             }
         }
     }
@@ -125,34 +130,18 @@ public class ObjectCreator {
      * When a primitive typed field is encountered this method parses System input to the desired type
      * @param c the desired primitive class
      * @return the parsed object from System.in
-     * @throws Exception
      */
-    private Object getPrimitive(Class c) throws Exception {
-
+    private Object getPrimitive(Class c) {
         Scanner keyboard = new Scanner(System.in);
         String input = keyboard.nextLine();
-
         // Try parsing user input to the fields type
-        if (c.equals(int.class)) {
-            return Integer.parseInt(input);
-
-        } else if (c.equals(boolean.class)) {
-            return Boolean.parseBoolean(input);
-
-        } else if (c.equals(short.class)) {
-            return Short.parseShort(input);
-
-        } else if (c.equals(long.class)) {
-            return Long.parseLong(input);
-
-        } else if (c.equals(float.class)) {
-            return Float.parseFloat(input);
-
-        } else if (c.equals(double.class)) {
-            return Double.parseDouble(input);
-        } else if (c.equals(byte.class)) {
-            return Byte.parseByte(input);
-        }
+        if (c.equals(int.class)) { return Integer.parseInt(input); }
+        else if (c.equals(boolean.class)) { return Boolean.parseBoolean(input); }
+        else if (c.equals(short.class)) { return Short.parseShort(input); }
+        else if (c.equals(long.class)) { return Long.parseLong(input); }
+        else if (c.equals(float.class)) { return Float.parseFloat(input); }
+        else if (c.equals(double.class)) { return Double.parseDouble(input); }
+        else if (c.equals(byte.class)) { return Byte.parseByte(input); }
         return null;
     }
 
@@ -167,7 +156,7 @@ public class ObjectCreator {
     private void createArrayField(Object obj, Field field, ArrayList object_list) throws Exception {
         field.setAccessible(true);
         Scanner keyboard = new Scanner(System.in);
-        System.out.println("Encountered an array field of type " + field.getType().getComponentType() + ", enter the desired length");
+        System.out.println("Encountered an array field of type " + field.getType().getComponentType().getName() + ", enter the desired length");
         System.out.println("length = ");
         int length = keyboard.nextInt();
 
@@ -186,7 +175,13 @@ public class ObjectCreator {
                 String input = keyboard.next();
                 if (input.equals("y")) {
                     // Create new reference
-                    Array.set(fieldArr, i, createObjectHelper(arrayType, object_list));
+                    if (isCollection) {
+                        String objName = promptUser();
+                        Class newObjClass = Class.forName("objects." + objName);
+                        Array.set(fieldArr, i, createObjectHelper(newObjClass, object_list));
+                    } else {
+                        Array.set(fieldArr, i, createObjectHelper(arrayType, object_list));
+                    }
                 } else if (input.equals("n")) {
                     // Create null reference
                     Array.set(fieldArr, i, null);
@@ -203,7 +198,7 @@ public class ObjectCreator {
      * Utility method to check if the object tracking list contains an object of a given type
      * @param list the array list tracking created objects at this point
      * @param c the class definition we are looking for in the list
-     * @return
+     * @return true if an object of Class c has been made already, false otherwise
      */
     private boolean objectListContainsType(ArrayList list, Class c) {
         for (Object obj: list) {

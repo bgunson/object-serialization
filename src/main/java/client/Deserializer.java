@@ -4,6 +4,7 @@ import org.json.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,13 +82,15 @@ public class Deserializer {
             String field_name = json_field.getString("name");
 
             Field field = object.getClass().getDeclaredField(field_name);
-            field.setAccessible(true);
+            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
+                field.setAccessible(true);
 
-            if (field.getType().isPrimitive()) {
-                // Found a primitive type field to be set
-                assignPrimitiveField(object, field, json_field);
-            } else {    // Must be object since we have checked for arrays alreadys
-                field.set(object, object_map.get(json_field.get("reference")));
+                if (field.getType().isPrimitive()) {
+                    // Found a primitive type field to be set
+                    assignPrimitiveField(object, field, json_field);
+                } else {    // Must be object since we have checked for arrays alreadys
+                    field.set(object, object_map.get(json_field.get("reference")));
+                }
             }
         }
     }
