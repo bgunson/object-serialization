@@ -16,19 +16,35 @@ public class Visualizer {
 
     private Map object_tracking_map = new IdentityHashMap();
 
+    /**
+     * This method starts the visualization of an object
+     * @param obj the object which is being visualized
+     */
     public void visualize(Object obj) throws Exception {
         Class c = obj.getClass();
         inspectClass(c, obj, 0);
     }
 
+    /**
+     * Utility function to calculate an indent for object display
+     * @param depth the current depth at whcih an object is being inspected
+     * @return the String equating to the amount of whitespace for the indent
+     */
     private String getIndent(int depth) {
         String tab = "";
         for (int i = 0; i < depth; i++) {
-            tab += " ";
+            tab += "\t";
         }
         return tab;
     }
 
+    /**
+     * This method inspects a class and an object of it instance and reports its superclass, interfaces, constructors,
+     * methods and fields to System.out
+     * @param c the class being inspected
+     * @param obj the object of c's definition
+     * @param depth the current depth compared to the original object
+     */
     private void inspectClass(Class c, Object obj, int depth) throws Exception {
 
         object_tracking_map.put(obj, object_tracking_map.size());
@@ -101,6 +117,11 @@ public class Visualizer {
         }
     }
 
+    /**
+     * Utility method to individually inspect a class's contructor
+     * @param c the constructor being inspected
+     * @param depth the current working depth
+     */
     public void inspectConstructor(Constructor c, int depth) {
 
         String indent = getIndent(depth);
@@ -119,6 +140,11 @@ public class Visualizer {
 
     }
 
+    /**
+     * Utility method to inspect a given method individually
+     * @param m the method being inspected
+     * @param depth the current working depth
+     */
     public void inspectMethod(Method m, int depth) {
 
         String indent = getIndent(depth);
@@ -137,6 +163,12 @@ public class Visualizer {
         System.out.println(indent2 + "Modifiers: " + Modifier.toString(m.getModifiers()));
     }
 
+    /**
+     * Utility method to individually inspect a field
+     * @param f the field being inspected
+     * @param obj the object who the field belongs
+     * @param depth the current working depth
+     */
     private void inspectField(Field f, Object obj, int depth) throws Exception {
         String indent = getIndent(depth);
         String indent2 = indent + " ";
@@ -168,6 +200,11 @@ public class Visualizer {
         }
     }
 
+    /**
+     * Utility method to inspect an array object when one is encountered
+     * @param obj array object being inspected
+     * @param depth the current working depth
+     */
     private void inspectArray(Object obj, int depth) throws Exception {
 
         String indent = getIndent(depth);
@@ -200,6 +237,11 @@ public class Visualizer {
         }
     }
 
+    /**
+     * Utility method to list exceptions to System.out
+     * @param exceptions the list of exceptions being reported
+     * @param depth the current working depth
+     */
     private void listExceptions(Class[] exceptions, int depth) {
 
         String indent = getIndent(depth);
@@ -213,6 +255,11 @@ public class Visualizer {
         }
     }
 
+    /**
+     * Utility method to list parameters to System.out
+     * @param parameters the list of parameters being reported
+     * @param depth the current working depth
+     */
     private void listParameterTypes(Class[] parameters, int depth) {
 
         String indent = getIndent(depth);
