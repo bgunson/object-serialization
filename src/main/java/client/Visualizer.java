@@ -8,9 +8,8 @@ import java.util.Map;
  *  Visulizer class is a modified version of my Inspector from CPSC501 A2 - Fall 2020
  *  Bennett Gunson - 30041789
  *
- *  The inspection of superclasses and interfaces has been disabled to make the output more readable, the reason being
- *  we care more about the deserialization of the object by seeing that its fields were retained and not so much
- *  about its super classes or interfaces (of which there are none in the five example objects).
+ *  The inspection of superclasses , interfaces, constructors, and methods have been disabled to
+ *  make the output more readable.
  */
 
 public class Visualizer {
@@ -20,10 +19,6 @@ public class Visualizer {
     public void visualize(Object obj) throws Exception {
         Class c = obj.getClass();
         inspectClass(c, obj, 0);
-        /*if (c.isArray())
-            inspectArray(obj, 1);
-        else
-            inspectClass(c, obj,0);*/
     }
 
     private String getIndent(int depth) {
