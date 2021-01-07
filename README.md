@@ -1,7 +1,5 @@
-# CPSC501 Assignment 3
-### Bennett Gunson - 30041789
 
-Reflective Object Serialization Project
+## Reflective Object Serialization Project
 
 This is a project that lets a user create 5 different objects and input their fields which is then 
 serialized to a JSON string using [org.json](https://github.com/stleary/JSON-java). These operations take place on a theoretical server. The serialized
