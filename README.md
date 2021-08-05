@@ -2,9 +2,8 @@
 ## Reflective Object Serialization Project
 
 This is a project that lets a user create 5 different objects and input their fields which is then 
-serialized to a JSON string using [org.json](https://github.com/stleary/JSON-java). These operations take place on a theoretical server. The serialized
-object is then sent to a socket via a server socket where it gets deserialized and vizualized 
-on the client side. 
+serialized to a JSON string using [org.json](https://github.com/stleary/JSON-java). These operations take place on a theoretical server where a 
+serialized object with unique properties is sent to a client via a socket, deserialized then recreated.
 
 I have used a Maven project structure to organize my external libraries and test classes. It is most
 easily ran from an IDE that supports Maven projects. I have represented the server/client in respective
